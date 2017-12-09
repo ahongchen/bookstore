@@ -1,15 +1,10 @@
+{% extends 'base.html' %}
 {% load staticfiles %}
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-<head>
-	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-	<title>尚硅谷书城-注册</title>
-	<link rel="stylesheet" type="text/css" href="/static/css/reset.css">
-	<link rel="stylesheet" type="text/css" href="/static/css/main.css">
-	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.1/css/bulma.css">
-	<script type="text/javascript" src="/static/js/jquery-1.12.4.min.js"></script>
-	<script type="text/javascript" src="/static/js/register.js"></script>
-</head>
+{% block title %}尚硅谷书城-注册{% endblock %}
+{% block head %} {% endblock %}
+{% block next %} {% endblock %}
+{% block body %}
+
 <body>
 	<div class="register_con">
 		<div class="l_con fl">
@@ -52,7 +47,6 @@
 					</li>
 					<li class="reg_sub">
                         <button class="button is-danger" id="submit_register" value="注 册" name="">注册</button>
-                        <button></button>
 					</li>
 				</ul>
 			</div>
@@ -62,7 +56,30 @@
 	</div>
 
     <script type="text/javascript">
-        $('#submit_register').click(function(){
+        $('#user_name').blur(function () {
+            var username = $('#user_name').val();
+            var data = {'username': username};
+
+            $.ajax({
+                data: JSON.stringify(data),
+                type: 'POST',
+                url: '/user/register_handle/',
+                success: function (res) {
+                    if (res.res === 1){
+                        alert('注册成功!');
+                        window.location.href = '/books/index';
+                    }else {
+                        alert('用户已被注册!');
+                    }
+                },
+                error: function (res) {
+                    console.log('error');
+                }
+            })
+        });
+
+
+        $('#submit_register').click(function() {
             var username = $('#user_name').val();
             var password = $('#pwd').val();
             var email = $('#email').val();
@@ -78,34 +95,15 @@
                 type: 'POST',
                 url: '/user/register_handle/',
                 success: function (res) {
-                    if (res.res === 1){
+                    if (res.res === 1) {
                         alert('注册成功!');
-                        $('#submit_register').next().val('success');
                         window.location.href = '/books/index';
-                    }else {
-                        alert('注册失败!');
                     }
-                },
-                error: function (res) {
-                    console.log('error');
                 }
             })
         })
     </script>
 
-	<div class="footer no-mp">
-		<div class="foot_link">
-			<a href="#">关于我们</a>
-			<span>|</span>
-			<a href="#">联系我们</a>
-			<span>|</span>
-			<a href="#">招聘人才</a>
-			<span>|</span>
-			<a href="#">友情链接</a>		
-		</div>
-		<p>CopyRight © 2016 北京尚硅谷信息技术有限公司 All Rights Reserved</p>
-		<p>电话：010-****888    京ICP备*******8号</p>
-	</div>
-	
-</body>
-</html>
+{% endblock %}
+
+{% block cart_count %}{% endblock cart_count %}

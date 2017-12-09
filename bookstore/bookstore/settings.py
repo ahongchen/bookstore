@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'users',  # 用户模块
     'books',  # 商品模块
     'tinymce',  # 富文本编辑器
+    'comments', # 评论
+    'cart', # 购物车
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -135,3 +137,17 @@ TINYMCE_DEFAULT_CONFIG = {
 }
 # 富文本编辑器的存储图片路径
 MEDIA_ROOT = os.path.join(BASE_DIR, "static")
+# redis配置
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/2",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "PASSWORD": ""
+        }
+    }
+}
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"

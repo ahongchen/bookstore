@@ -4,9 +4,10 @@ from books.enums import *
 from django.http import JsonResponse
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator
+from django.views.decorators.cache import cache_page
 # Create your views here.
 
-
+@cache_page(60*5)
 def index(request):
     '''显示首页'''
     # 查询每个种类的3个新品信息和4个销量最好的商品信息
@@ -22,7 +23,7 @@ def index(request):
     operatingsystem_hot = Books.objects.get_books_by_type(OPERATINGSYSTEM, 4, sort='hot')
     database_new = Books.objects.get_books_by_type(DATABASE, 3, sort='new')
     database_hot = Books.objects.get_books_by_type(DATABASE, 4, sort='hot')
-
+    print('未未未未未未未未加载缓存')
     # 定义模板上下文
     context = {
         'python_new': python_new,
@@ -82,6 +83,7 @@ def list(request, type_id, page):
     # 判断type_id是否合法
     if int(type_id) not in BOOK_TYPE.keys():
         return redirect(reverse('books:index'))
+    # 获得书籍及属性
     books_li = Books.objects.get_books_by_type(type_id, sort=sort)
     # 分页
     paginator = Paginator(books_li, 1)

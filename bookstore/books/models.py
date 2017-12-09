@@ -42,6 +42,7 @@ class Books(BaseModel):
     detail = models.CharField(max_length=500, verbose_name='书籍详情')
     unite = models.CharField(max_length=5, verbose_name='书籍单位')
     sales = models.IntegerField(default=0, verbose_name='商品销量')
+    stock = models.IntegerField(default=1, verbose_name='商品库存')
     type_id = models.SmallIntegerField(default=PYTHON, choices=book_type_choices, verbose_name='商品种类')
     status = models.SmallIntegerField(default=ONLINE, choices=status_choices, verbose_name='商品状态')
     # 使用富文本编辑器

@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
-from users.models import Passport
+from users.models import Passport,Address
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.http import JsonResponse
+from utils.decorators import login_required
 # Create your views here.
 
 
@@ -17,27 +18,33 @@ def register_handle(request):
     # 接收数据
     data = json.loads(request.body.decode('utf-8'))
 
-    # data = {
-    #     'username': '',
-    #     'password': '',
-    #     'email': ''
-    # }
     username = data.get('username', '')
-    password = data.get('password', '')
-    email = data.get('email', '')
     # 进行数据校验
-    if not all([username, password, email]):
+    if not all([username]):
         # 有空的数据
         return JsonResponse({'code': 500})
     # 判断邮箱是否合法 TODO
     p = Passport.objects.get_only_name(username)
     if not p:
-        # 向系统中添加账户
-        Passport.objects.add_one_passport(username=username, password=password, email=email)
         # 返回登录页
         # return redirect(reverse('user:login'))
         return JsonResponse({'res': 1})
     return JsonResponse({'res': 500})
+
+
+@csrf_exempt
+def register_done(request):
+    # 接收数据
+    data = json.loads(request.body.decode('utf-8'))
+
+    username = data.get('username', '')
+    password = data.get('password', '')
+    email = data.get('email', '')
+    # 向系统中添加账户
+    Passport.objects.add_one_passport(username=username, password=password, email=email)
+    # 返回登录页
+    # return redirect(reverse('user:login'))
+    return JsonResponse({'res': 1})
 
 
 def login(request):
@@ -98,4 +105,21 @@ def logout(request):
     request.session.flush()
     # 重定向到首页
     return redirect(reverse('books:index'))
-    # return render(request, 'books/index.html')
+
+
+@login_required
+def user(request):
+    '''用户中心-信息页'''
+    passport_id = request.session.get('passport_id')
+    # 获取用户的基本信息
+    addr = Address.objects.get_default_address(passport_id=passport_id)
+
+    books_li = []
+
+    context = {
+        'addr': addr,
+        'page': 'user',
+        'books_li': books_li
+    }
+
+    return render(request, 'users/user_center_info.html', context)
