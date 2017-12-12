@@ -23,4 +23,5 @@ urlpatterns = [
     url(r'^books/',include('books.urls', namespace='books')),
     url(r'^comments/',include('comments.urls', namespace='comments')),
     url(r'^cart/',include('cart.urls', namespace='cart')),
+    url(r'^order/',include('order.urls', namespace='order')),
 ]

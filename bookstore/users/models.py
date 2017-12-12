@@ -38,17 +38,20 @@ class PassportManager(models.Manager):
 
 class Passport(BaseModel):
     # 用户系统
-
     username = models.CharField(max_length=20, verbose_name='用户名')
     password = models.CharField(max_length=40, verbose_name='密码')
     email = models.EmailField(verbose_name='邮箱')
     is_active = models.BooleanField(default=False, verbose_name='激活')
-
     # 用户表的管理器
     objects = PassportManager()
 
     class Meta:
         db_table = 's_user_account'
+        verbose_name = '基本信息'
+        verbose_name_plural = verbose_name
+
+    def __unicode__(self):
+        return self.username
 
 
 class AddressManager(models.Manager):

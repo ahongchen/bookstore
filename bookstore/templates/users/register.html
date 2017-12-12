@@ -65,10 +65,7 @@
                 type: 'POST',
                 url: '/user/register_handle/',
                 success: function (res) {
-                    if (res.res === 1){
-                        alert('注册成功!');
-                        window.location.href = '/books/index';
-                    }else {
+                    if (res.res === 500){
                         alert('用户已被注册!');
                     }
                 },
@@ -93,11 +90,13 @@
             $.ajax({
                 data: JSON.stringify(data),
                 type: 'POST',
-                url: '/user/register_handle/',
+                url: '/user/register_done/',
                 success: function (res) {
                     if (res.res === 1) {
                         alert('注册成功!');
                         window.location.href = '/books/index';
+                    }else if (res.res === 500){
+                        alert('内容不能为空!');
                     }
                 }
             })

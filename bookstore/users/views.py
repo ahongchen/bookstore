@@ -3,8 +3,13 @@ from django.core.urlresolvers import reverse
 from users.models import Passport,Address
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.core.mail import send_mail
 from django.http import JsonResponse
 from utils.decorators import login_required
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from itsdangerous import SignatureExpired
+from bookstore import settings
+from order.models import OrderGoods, OrderInfo
 # Create your views here.
 
 
@@ -19,11 +24,8 @@ def register_handle(request):
     data = json.loads(request.body.decode('utf-8'))
 
     username = data.get('username', '')
-    # 进行数据校验
-    if not all([username]):
-        # 有空的数据
-        return JsonResponse({'code': 500})
     # 判断邮箱是否合法 TODO
+    # 判断用户名是否重复
     p = Passport.objects.get_only_name(username)
     if not p:
         # 返回登录页
@@ -40,8 +42,19 @@ def register_done(request):
     username = data.get('username', '')
     password = data.get('password', '')
     email = data.get('email', '')
+    # 进行数据校验
+    if not all([username, password, email]):
+        # 有空的数据
+        return JsonResponse({'res': 500})
+
     # 向系统中添加账户
-    Passport.objects.add_one_passport(username=username, password=password, email=email)
+    passport = Passport.objects.add_one_passport(username=username, password=password, email=email)
+    # 生成激活的token itsdangerous
+    serializer = Serializer(settings.SECRET_KEY, 3600)
+    token = serializer.dumps({'confirm': passport.id}) # 返回bytes
+    token = token.decode()
+    # 给用户的邮箱发激活邮件
+    send_mail('尚硅谷书城用户激活', '', settings.EMAIL_FROM, [email], html_message='<a href="http://127.0.0.1:8001/user/active/%s/">http://127.0.0.1:8001/user/active/</a>' % token)
     # 返回登录页
     # return redirect(reverse('user:login'))
     return JsonResponse({'res': 1})
@@ -123,3 +136,58 @@ def user(request):
     }
 
     return render(request, 'users/user_center_info.html', context)
+
+def address(request):
+    '''用户中心-收货地址'''
+    # 获取登录用户的id
+    passport_id = request.session.get('passport_id')
+    if request.method == 'GET':
+        # 查询用户的默认地址
+        addr = Address.objects.get_default_address(passport_id=passport_id)
+        return render(request, 'users/user_center_site.html', {'addr': addr, 'page': 'address'})
+    else:
+        # 添加收货地址
+        # 1.接收数据
+        recipent_name = request.POST.get('username')
+        recipent_addr = request.POST.get('addr')
+        zip_code = request.POST.get('zip_code')
+        recipent_phone = request.POST.get('phone')
+        # 2.进行校验
+        if not all([recipent_name, recipent_addr, zip_code, recipent_phone]):
+            return render(request, 'users/user_center_site.html', {'errmsg': '参数不能为空'})
+        # 3.添加收货地址
+        Address.objects.add_one_address(passport_id=passport_id,
+                                        recipient_name=recipent_name,
+                                        recipient_addr=recipent_addr,
+                                        zip_code=zip_code,
+                         recipient_phone=recipent_phone)
+        # 4.返回应答
+        return redirect(reverse('user:address'))
+
+@login_required
+def order(request):
+    '''全部订单页面'''
+    # 查询用户的订单信息
+    passport_id = request.session.get('passport_id')
+    # 获取订单信息
+    order_li = OrderInfo.objects.filter(passport_id=passport_id)
+    # 遍历获取订单的商品信息
+    # order -> OrderInfo实例对象
+    for order in order_li:
+        order_id = order.order_id
+        order_books_li = OrderGoods.objects.filter(order_id=order_id)
+        # 计算商品的小计
+        # order_books -> OrderBooks实例对象
+        for order_books in order_books_li:
+            count = order_books.count
+            price = order_books.price
+            amount = count * price
+            # 保存订单中每一个商品的小计
+            order_books.amount = amount
+        # 给order对象动态增加一个属性order_goods_li，保存订单中商品的信息
+        order.order_books_li = order_books_li
+        context = {
+            'order_li': order_li,
+            'page': 'order'
+        }
+        return render(request, 'users/user_center_order.html', context)
