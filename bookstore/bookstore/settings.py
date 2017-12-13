@@ -53,6 +53,10 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'utils.middleware.BookMiddleware',
+    'utils.middleware.AnotherMiddleware',
+    'utils.middleware.UrlPathRecordMiddleware',
+    'utils.middleware.BlockedIpMiddleware',
 ]
 
 ROOT_URLCONF = 'bookstore.urls'
