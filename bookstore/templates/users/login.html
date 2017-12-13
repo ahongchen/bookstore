@@ -25,6 +25,12 @@
 						<div class="user_error">输入错误</div>
 						<input type="password" name="pwd" id="pwd" class="pass_input" placeholder="请输入密码">
 						<div class="pwd_error">输入错误</div>
+
+                        <div style="top: 100px; position: absolute;">
+                            <input type="text" id="vc" name="vc">
+                            <img id="verifycode" src="{% url 'user:verifycode' %}" alt="CheckCode">
+                        </div>
+
 						<div class="more_input clearfix">
 							<input type="checkbox" id="remember" name="remember" {{ checked }}>
 							<label>记住用户名</label>
@@ -43,11 +49,13 @@
             var username = $('#user_name').val();
             var password = $('#pwd').val();
             var remember = $('#remember').prop('checked');
+            var vc = $('input[name="vc"]').val();
 
             var data = {
                 'username': username,
                 'password': password,
-                'remember': remember
+                'remember': remember,
+                'verifycode': vc
             };
 
             $.ajax({

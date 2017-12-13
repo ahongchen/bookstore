@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from .views import register, register_handle, login, login_check, logout, user, register_done, address, order
+from .views import register, register_handle, login, login_check, logout, user, register_done, address, order, verifycode
 
 urlpatterns = [
     url(r'^register/', register, name='register'),
@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'^user_center/', user, name='user'),
     url(r'^address/', address, name='address'),
     url(r'^order/', order, name='order'),
+    url(r'^verifycode/', verifycode, name='verifycode'),
 ]

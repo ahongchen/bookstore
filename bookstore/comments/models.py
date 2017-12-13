@@ -1,5 +1,7 @@
 from django.db import models
 from db.base_model import BaseModel
+from users.models import Passport
+from books.models import Books
 # Create your models here.
 
 
