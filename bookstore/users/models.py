@@ -47,10 +47,10 @@ class Passport(BaseModel):
 
     class Meta:
         db_table = 's_user_account'
-        verbose_name = '基本信息'
+        verbose_name = '用户基本信息'
         verbose_name_plural = verbose_name
 
-    def __unicode__(self):
+    def __str__(self):
         return self.username
 
 

@@ -52,3 +52,8 @@ class Books(BaseModel):
 
     class Meta:
         db_table = 's_books'
+        verbose_name = '书籍基本信息'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.name
