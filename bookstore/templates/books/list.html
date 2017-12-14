@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 {% block title %}尚硅谷书城-商品列表{% endblock %}
-{% block head %} {{ block.super}} {% endblock %}
-{% block next %} {{ block.super }}{% endblock %}
 {% block body %}
 
 
@@ -61,7 +59,8 @@
                     {% endif %}
                 {% endfor %}
                 {% if books_li.has_next %}
-                    <a href="/list/{{ type_id }}/{{ books_li.next_page_number }}/?sort={{ sort }}">下一页></a>
+{#                    <a href="books/list/{{ type_id }}/{{ books_li.next_page_number }}/?sort={{ sort }}">下一页></a>#}
+                    <a href="{% url 'books:list' type_id=type_id page=books_li.next_page_number %}">下一页></a>
                 {% endif %}
             </div>
         </div>

@@ -10,12 +10,12 @@
         // 计算总价
         function update_total_price() {
             // 获取商品的价格和数量
-            books_price = $('.show_pirze').children('em').text()
+            books_price = $('.show_pirze').children('em').text();
             books_count = $('.num_show').val();
             // 计算商品的总价
-            books_price = parseFloat(books_price)
+            books_price = parseFloat(books_price);
             books_count = parseInt(books_count);
-            total_price = books_price * books_count
+            total_price = books_price * books_count;
             // 设置商品总价
             $('.total').children('em').text(total_price.toFixed(2) + '元')
         }
@@ -25,7 +25,7 @@
             // 获取商品的数量
             books_count = $('.num_show').val();
             // 加1
-            books_count = parseInt(books_count) + 1
+            books_count = parseInt(books_count) + 1;
             // 重新设置值
             $('.num_show').val(books_count);
             // 计算总价
@@ -37,7 +37,7 @@
             // 获取商品的数量
             books_count = $('.num_show').val();
             // 加1
-            books_count = parseInt(books_count) - 1
+            books_count = parseInt(books_count) - 1;
             if (books_count == 0){
                 books_count = 1
             }

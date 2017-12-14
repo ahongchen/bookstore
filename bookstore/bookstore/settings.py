@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'cart', # 购物车
     'order', # 订单
     'haystack',
+    'users.templatetags.filters', # 过滤器
 ]
 
 MIDDLEWARE_CLASSES = [
