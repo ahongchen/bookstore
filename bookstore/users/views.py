@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from users.models import Passport,Address
+from books.models import Books
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.core.mail import send_mail
@@ -12,6 +13,7 @@ from bookstore import settings
 from order.models import OrderGoods, OrderInfo
 from django.http import HttpResponse
 from PIL import Image, ImageDraw, ImageFont # 引入绘图模块
+from django_redis import get_redis_connection
 import random
 
 # Create your views here.
@@ -135,9 +137,16 @@ def user(request):
     passport_id = request.session.get('passport_id')
     # 获取用户的基本信息
     addr = Address.objects.get_default_address(passport_id=passport_id)
+    # 获取用户的最近浏览信息
+    con = get_redis_connection('default')
+    key = 'history_%d'%passport_id
+    # 取出用户最近浏览为各商品的id
+    history_li = con.lrange(key, 0, 4)
 
     books_li = []
-
+    for id in history_li:
+        books = Books.objects.get_books_by_id(books_id=id)
+        books_li.append(books)
     context = {
         'addr': addr,
         'page': 'user',
@@ -145,6 +154,7 @@ def user(request):
     }
 
     return render(request, 'users/user_center_info.html', context)
+
 
 def address(request):
     '''用户中心-收货地址'''

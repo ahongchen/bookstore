@@ -4,6 +4,7 @@ from books.enums import *
 from django.http import JsonResponse
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator
+from django_redis import get_redis_connection
 from django.views.decorators.cache import cache_page
 # Create your views here.
 
@@ -55,6 +56,16 @@ def detail(request, books_id):
         return redirect(reverse('books:index'))
     # 根据类型获取
     books_li = Books.objects.get_books_by_type(type_id=books.type_id, limit=2, sort='new')
+    # 用户登陆之后才能浏览记录,每个用路浏览记录对应redis中的一条信息,格式:'history_用户id':[10,9,2,3,4]
+    if request.session.has_key('islogin'):
+        # 用户已登录,记录浏览记录
+        con = get_redis_connection('default')
+        key = 'history_%d'%request.session.get('passport_id')
+        # 先从redies列表中移除books.id
+        con.lrem(key, 0, books.id)
+        con.lpush(key, books.id)
+        # 保存用户最近浏览的五个商品
+        con.ltrim(key, 0, 4)
     context = {'books': books, 'books_li': books_li}
     return render(request, 'books/detail.html', context)
 
